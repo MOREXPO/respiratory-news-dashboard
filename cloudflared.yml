@@ -4,6 +4,4 @@ credentials-file: /data/.cloudflared/ec4d92d3-5aa2-4ff5-bb27-de4b1a11ae77.json
 ingress:
   - hostname: respiratory.iamoex.com
     service: http://localhost:3014
-  - hostname: respiratory-news.iamoex.com
-    service: http://localhost:3014
   - service: http_status:404
