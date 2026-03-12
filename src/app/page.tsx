@@ -45,6 +45,8 @@ export default function Home() {
   const [onlyHighScore, setOnlyHighScore] = useState(false);
 
   const [loading, setLoading] = useState(true);
+  const [runningScan, setRunningScan] = useState(false);
+  const [scanMsg, setScanMsg] = useState('');
 
   async function loadNews() {
     const query = new URLSearchParams({ company, from, to });
@@ -64,6 +66,21 @@ export default function Home() {
     setLoading(true);
     await Promise.all([loadNews(), loadOpps()]);
     setLoading(false);
+  }
+
+  async function runOpportunityScan() {
+    setRunningScan(true);
+    setScanMsg('Ejecutando detección...');
+    try {
+      const res = await fetch('/api/opportunities/run', { method: 'POST' });
+      const data = await res.json();
+      setScanMsg(data?.message || 'Detección completada.');
+      await loadOpps();
+    } catch {
+      setScanMsg('Error ejecutando la detección manual.');
+    } finally {
+      setRunningScan(false);
+    }
   }
 
   useEffect(() => {
@@ -160,6 +177,18 @@ export default function Home() {
         ) : (
           <>
             <section className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm text-zinc-300">Detección manual de empresas objetivo</p>
+                <button
+                  className="bg-emerald-600 hover:bg-emerald-500 rounded px-3 py-2 text-sm disabled:opacity-60"
+                  onClick={runOpportunityScan}
+                  disabled={runningScan}
+                >
+                  {runningScan ? 'Detectando…' : 'Detectar oportunidades ahora'}
+                </button>
+              </div>
+              {scanMsg && <p className="text-xs text-zinc-400">{scanMsg}</p>}
+
               <div className="grid md:grid-cols-6 gap-2">
                 <input className="bg-zinc-800 rounded px-3 py-2 md:col-span-2" placeholder="Buscar oportunidad..." value={q} onChange={(e) => setQ(e.target.value)} />
                 <input className="bg-zinc-800 rounded px-3 py-2" type="number" min={0} max={10} step={0.5} value={minScore} onChange={(e) => setMinScore(e.target.value)} placeholder="Score min" />
