@@ -36,6 +36,11 @@ export default function Home() {
   const [opps, setOpps] = useState<Opportunity[]>([]);
   const [q, setQ] = useState('');
   const [minScore, setMinScore] = useState('0');
+  const [maxScore, setMaxScore] = useState('10');
+  const [difficulty, setDifficulty] = useState<'ALL' | 'Baja' | 'Media' | 'Alta'>('ALL');
+  const [potential, setPotential] = useState<'ALL' | 'Bajo' | 'Medio' | 'Alto'>('ALL');
+  const [selectedTag, setSelectedTag] = useState('ALL');
+  const [sortBy, setSortBy] = useState<'score_desc' | 'score_asc' | 'recent'>('score_desc');
   const [onlyToday, setOnlyToday] = useState(false);
   const [onlyHighScore, setOnlyHighScore] = useState(false);
 
@@ -75,15 +80,34 @@ export default function Home() {
     return [...map.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
   }, [news]);
 
+  const tagOptions = useMemo(() => {
+    const s = new Set<string>();
+    opps.forEach((o) => o.tags.forEach((t) => s.add(t)));
+    return ['ALL', ...Array.from(s).sort((a, b) => a.localeCompare(b))];
+  }, [opps]);
+
   const filteredOpps = useMemo(() => {
-    return opps.filter((i) => {
+    const min = Number(minScore || 0);
+    const max = Number(maxScore || 10);
+
+    const list = opps.filter((i) => {
       if (onlyToday && !i.createdAt.startsWith(today)) return false;
       if (onlyHighScore && i.score < 8.5) return false;
+      if (!Number.isNaN(min) && i.score < min) return false;
+      if (!Number.isNaN(max) && i.score > max) return false;
+      if (difficulty !== 'ALL' && i.technicalDifficulty !== difficulty) return false;
+      if (potential !== 'ALL' && i.businessPotential !== potential) return false;
+      if (selectedTag !== 'ALL' && !i.tags.includes(selectedTag)) return false;
       return true;
     });
-  }, [opps, onlyToday, onlyHighScore, today]);
+
+    if (sortBy === 'score_asc') return [...list].sort((a, b) => a.score - b.score);
+    if (sortBy === 'recent') return [...list].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    return [...list].sort((a, b) => b.score - a.score);
+  }, [opps, onlyToday, onlyHighScore, today, minScore, maxScore, difficulty, potential, selectedTag, sortBy]);
 
   const topOpps = useMemo(() => [...opps].sort((a, b) => b.score - a.score).slice(0, 5), [opps]);
+  const avgScore = useMemo(() => (filteredOpps.length ? (filteredOpps.reduce((a, b) => a + b.score, 0) / filteredOpps.length).toFixed(2) : '0.00'), [filteredOpps]);
 
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-10">
@@ -135,12 +159,53 @@ export default function Home() {
           </>
         ) : (
           <>
-            <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 grid md:grid-cols-4 gap-2">
-              <input className="bg-zinc-800 rounded px-3 py-2 md:col-span-2" placeholder="Buscar oportunidad..." value={q} onChange={(e) => setQ(e.target.value)} />
-              <input className="bg-zinc-800 rounded px-3 py-2" type="number" min={0} max={10} step={0.5} value={minScore} onChange={(e) => setMinScore(e.target.value)} />
-              <button className="bg-blue-600 rounded px-3 py-2" onClick={loadOpps}>Filtrar</button>
-              <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={onlyToday} onChange={(e) => setOnlyToday(e.target.checked)} /> Solo nuevas de hoy</label>
-              <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={onlyHighScore} onChange={(e) => setOnlyHighScore(e.target.checked)} /> Solo score ≥ 8.5</label>
+            <section className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4 space-y-3">
+              <div className="grid md:grid-cols-6 gap-2">
+                <input className="bg-zinc-800 rounded px-3 py-2 md:col-span-2" placeholder="Buscar oportunidad..." value={q} onChange={(e) => setQ(e.target.value)} />
+                <input className="bg-zinc-800 rounded px-3 py-2" type="number" min={0} max={10} step={0.5} value={minScore} onChange={(e) => setMinScore(e.target.value)} placeholder="Score min" />
+                <input className="bg-zinc-800 rounded px-3 py-2" type="number" min={0} max={10} step={0.5} value={maxScore} onChange={(e) => setMaxScore(e.target.value)} placeholder="Score max" />
+                <select className="bg-zinc-800 rounded px-3 py-2" value={difficulty} onChange={(e) => setDifficulty(e.target.value as any)}>
+                  <option value="ALL">Dificultad: todas</option>
+                  <option value="Baja">Baja</option>
+                  <option value="Media">Media</option>
+                  <option value="Alta">Alta</option>
+                </select>
+                <button className="bg-blue-600 hover:bg-blue-500 rounded px-3 py-2" onClick={loadOpps}>Actualizar</button>
+              </div>
+
+              <div className="grid md:grid-cols-5 gap-2">
+                <select className="bg-zinc-800 rounded px-3 py-2" value={potential} onChange={(e) => setPotential(e.target.value as any)}>
+                  <option value="ALL">Potencial: todos</option>
+                  <option value="Bajo">Bajo</option>
+                  <option value="Medio">Medio</option>
+                  <option value="Alto">Alto</option>
+                </select>
+                <select className="bg-zinc-800 rounded px-3 py-2" value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)}>
+                  {tagOptions.map((tag) => <option key={tag} value={tag}>{tag === 'ALL' ? 'Tag: todos' : tag}</option>)}
+                </select>
+                <select className="bg-zinc-800 rounded px-3 py-2" value={sortBy} onChange={(e) => setSortBy(e.target.value as any)}>
+                  <option value="score_desc">Orden: score ↓</option>
+                  <option value="score_asc">Orden: score ↑</option>
+                  <option value="recent">Orden: más reciente</option>
+                </select>
+                <label className="text-sm flex items-center gap-2 bg-zinc-800 rounded px-3 py-2"><input type="checkbox" checked={onlyToday} onChange={(e) => setOnlyToday(e.target.checked)} /> Solo hoy</label>
+                <label className="text-sm flex items-center gap-2 bg-zinc-800 rounded px-3 py-2"><input type="checkbox" checked={onlyHighScore} onChange={(e) => setOnlyHighScore(e.target.checked)} /> Score ≥ 8.5</label>
+              </div>
+            </section>
+
+            <section className="grid md:grid-cols-3 gap-3">
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                <p className="text-zinc-400 text-xs">Resultados filtrados</p>
+                <p className="text-2xl font-bold">{filteredOpps.length}</p>
+              </div>
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                <p className="text-zinc-400 text-xs">Score medio</p>
+                <p className="text-2xl font-bold">{avgScore}</p>
+              </div>
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                <p className="text-zinc-400 text-xs">Total oportunidades</p>
+                <p className="text-2xl font-bold">{opps.length}</p>
+              </div>
             </section>
 
             <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
@@ -157,15 +222,26 @@ export default function Home() {
             ) : (
               <section className="grid gap-4">
                 {filteredOpps.map((o) => (
-                  <article key={o.id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 space-y-2">
+                  <article key={o.id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 space-y-3 shadow-lg shadow-black/20">
                     <div className="flex justify-between gap-3 items-start">
                       <h3 className="text-xl font-semibold">{o.title}</h3>
                       <span className="text-sm rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-1">{o.score}/10</span>
                     </div>
+
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1">Dificultad: {o.technicalDifficulty}</span>
+                      <span className="rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1">Potencial: {o.businessPotential}</span>
+                      <span className="rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1">{new Date(o.createdAt).toLocaleDateString('es-ES')}</span>
+                    </div>
+
                     <p className="text-zinc-300">{o.description}</p>
                     <p><b>Problema:</b> {o.marketProblem}</p>
                     <p><b>Solución:</b> {o.proposedSolution}</p>
                     <p><b>Integración:</b> {o.technicalIntegration}</p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {o.tags.slice(0, 8).map((t) => <span key={t} className="text-xs px-2 py-1 rounded bg-zinc-800 border border-zinc-700">{t}</span>)}
+                    </div>
                   </article>
                 ))}
               </section>
