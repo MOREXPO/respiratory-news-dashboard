@@ -1,0 +1,12 @@
+[
+  {
+    "id": "seed-1",
+    "company": "ResMed",
+    "date": "2026-03-11",
+    "title": "Form 4 reportado en SEC",
+    "summary": "Movimiento insider reportado en filing regulatorio (Form 4).",
+    "url": "https://data.sec.gov/submissions/CIK0000943819.json",
+    "source": "SEC",
+    "createdAt": "2026-03-12T14:00:00.000Z"
+  }
+]
