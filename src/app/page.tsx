@@ -242,6 +242,21 @@ export default function Home() {
                     <div className="flex flex-wrap gap-2">
                       {o.tags.slice(0, 8).map((t) => <span key={t} className="text-xs px-2 py-1 rounded bg-zinc-800 border border-zinc-700">{t}</span>)}
                     </div>
+
+                    {o.sourceLinks?.length > 0 && (
+                      <div className="pt-1">
+                        <p className="text-xs text-zinc-400 mb-1">Fuentes:</p>
+                        <ul className="list-disc pl-5 text-sm text-blue-300 space-y-1">
+                          {o.sourceLinks.slice(0, 6).map((s) => (
+                            <li key={s}>
+                              <a href={s} target="_blank" rel="noreferrer" className="underline break-all">
+                                {s}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </article>
                 ))}
               </section>
