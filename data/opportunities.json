@@ -1,1 +1,267 @@
-[]
+[
+  {
+    "title": "RespBridge FHIR: Middleware neutro para AirView/EveryWare/Care Orchestrator",
+    "description": "Capa SaaS de interoperabilidad que normaliza telemetría respiratoria multi-fabricante (CPAP, BiPAP, ventilación domiciliaria) y la expone en FHIR/HL7 para HCE, ERP y motores de reglas clínicas.",
+    "marketProblem": "Los proveedores domiciliarios trabajan con plataformas cerradas y flujos heterogéneos, con exportaciones manuales y baja trazabilidad clínica-operativa entre fabricantes y sistemas internos.",
+    "proposedSolution": "Conectores por fabricante + modelo canónico respiratorio + API FHIR R4 (Device, Observation, Patient, CarePlan) + mensajería HL7 v2 para legado.",
+    "technicalIntegration": "Ingesta desde ResMed AirView, Breas EveryWare y Philips Care Orchestrator (vía APIs disponibles, SFTP, CSV seguros o RPA controlada), normalización en servidor FHIR (HAPI FHIR), transformación con Mirth Connect y publicación a HIS/EMR.",
+    "potentialClients": [
+      "Air Liquide Healthcare",
+      "Vitalaire",
+      "Linde Healthcare",
+      "Oximesa",
+      "Esteve Teijin"
+    ],
+    "technicalDifficulty": "Alta",
+    "businessPotential": "Alto",
+    "barriers": "Acceso contractual a datos de fabricantes, validación regulatoria (MDR/ISO 13485 según alcance), ciberseguridad y gobierno del dato multicentro.",
+    "validationSteps": "1) Piloto con 1 proveedor y 2 fabricantes. 2) Medir reducción de tiempo administrativo y latencia de datos. 3) Validar mapeos FHIR con equipo clínico. 4) Escalar por conectores priorizados.",
+    "score": 9.1,
+    "tags": [
+      "FHIR",
+      "HL7",
+      "CPAP",
+      "NIV",
+      "Interoperabilidad",
+      "RPM"
+    ],
+    "sourceLinks": [
+      "https://www.breas.com/products/everyware/",
+      "https://sleepreviewmag.com/sleep-diagnostics/connected-care/philips-care-orchestrator-cloud-based-clinical-management-software/",
+      "https://www.hl7.org/fhir/overview.html",
+      "https://build.fhir.org/device.html",
+      "https://www.nextgen.com/solutions/interoperability/mirth-integration-engine"
+    ],
+    "id": "3d2c440e-1040-4eb9-accc-1e82446192b3",
+    "createdAt": "2026-03-12T20:04:49.749Z"
+  },
+  {
+    "title": "Adherence Copilot: motor de alertas tempranas de adherencia CPAP/NIV",
+    "description": "Motor analítico que detecta riesgo de abandono terapéutico y genera intervenciones priorizadas para equipos asistenciales (llamada, ajuste máscara, humidificación, educación).",
+    "marketProblem": "La baja adherencia reduce resultados clínicos y reembolso; los equipos clínicos reciben demasiadas señales sin priorización y reaccionan tarde.",
+    "proposedSolution": "Scoring de riesgo por paciente con variables de uso nocturno, fugas, AHI residual, eventos y patrones de comportamiento; bandeja de trabajo con recomendaciones accionables.",
+    "technicalIntegration": "Conectores a plataformas de telemonitorización respiratoria + ingestión en data lake + reglas clínicas + modelo ML explicable + salida a CRM clínico/centro de contacto.",
+    "potentialClients": [
+      "Oximesa",
+      "Esteve Teijin",
+      "Vitalaire",
+      "Air Liquide Healthcare"
+    ],
+    "technicalDifficulty": "Media",
+    "businessPotential": "Alto",
+    "barriers": "Calidad/consistencia de datos entre dispositivos, necesidad de validación clínica local, gestión del cambio en equipos de seguimiento.",
+    "validationSteps": "1) Cohorte retrospectiva 6-12 meses. 2) AUC y calibración del riesgo. 3) Piloto prospectivo con grupo control. 4) Medir adherencia a 90 días, reducción de abandonos y ROI operativo.",
+    "score": 8.8,
+    "tags": [
+      "Adherencia",
+      "CPAP",
+      "NIV",
+      "Analítica",
+      "Alertas clínicas"
+    ],
+    "sourceLinks": [
+      "https://pubmed.ncbi.nlm.nih.gov/?term=CPAP+telemonitoring+adherence",
+      "https://pubmed.ncbi.nlm.nih.gov/?term=home+noninvasive+ventilation+telemonitoring",
+      "https://sleepreviewmag.com/sleep-diagnostics/connected-care/philips-care-orchestrator-cloud-based-clinical-management-software/"
+    ],
+    "id": "75f529d2-45eb-4d33-aa1e-ddcc04683748",
+    "createdAt": "2026-03-12T20:04:49.749Z"
+  },
+  {
+    "title": "Worklist Unificada TRD: automatización de procesos de proveedor domiciliario",
+    "description": "Plataforma de orquestación que convierte eventos clínicos de telemonitorización en tareas operativas (renovaciones, cumplimiento documental, incidencias técnicas, logística de consumibles).",
+    "marketProblem": "La operación diaria depende de procesos manuales y fragmentados entre plataformas clínicas, facturación y contact center, elevando costes y tiempos de respuesta.",
+    "proposedSolution": "Motor BPM + reglas de negocio para crear y enrutar tareas automáticamente según umbrales clínicos y reglas administrativas por pagador/territorio.",
+    "technicalIntegration": "Integración con telemonitorización, ERP/facturación, CRM y herramientas de contact center; conectores estándar REST, FHIR y HL7 v2; auditoría completa de eventos.",
+    "potentialClients": [
+      "Linde Healthcare",
+      "Vitalaire",
+      "Air Liquide Healthcare",
+      "Oximesa"
+    ],
+    "technicalDifficulty": "Media",
+    "businessPotential": "Alto",
+    "barriers": "Heterogeneidad de procesos por país/proveedor, deuda técnica de sistemas legacy, necesidad de sponsorship operativo-clínico.",
+    "validationSteps": "1) Mapear 10 procesos críticos. 2) Implementar 3 flujos de alto volumen. 3) Medir TAT, first-time-right y coste por paciente. 4) Escalar progresivamente por región.",
+    "score": 8.4,
+    "tags": [
+      "Automatización",
+      "BPM",
+      "TRD",
+      "Homecare",
+      "Operaciones"
+    ],
+    "sourceLinks": [
+      "https://www.vitalaire.com/",
+      "https://www.linde-gas.com/industries/healthcare",
+      "https://www.oximesa.es/",
+      "https://www.esteveteijin.com/"
+    ],
+    "id": "06bc9d1d-cf08-47b6-b82f-a00a50aa05a0",
+    "createdAt": "2026-03-12T20:04:49.749Z"
+  },
+  {
+    "title": "Benchmark de desempeño por dispositivo y máscara (Device Intelligence)",
+    "description": "Módulo BI que compara rendimiento real por dispositivo/interfaz (fuga, horas de uso, incidencias, sustituciones) para optimizar compras, protocolos y outcomes.",
+    "marketProblem": "Las decisiones de compra y protocolo se basan en reportes dispersos y no comparables entre marcas, sin visión longitudinal unificada.",
+    "proposedSolution": "Data mart de rendimiento por cohorte + paneles por fabricante/modelo + análisis de coste-resultado para comités clínico-operativos.",
+    "technicalIntegration": "Normalización de catálogos Device y Observation en FHIR; enriquecimiento con incidencias de soporte y logística; cuadros en Power BI/Tableau con gobierno de datos.",
+    "potentialClients": [
+      "Air Liquide Healthcare",
+      "Linde Healthcare",
+      "Esteve Teijin",
+      "Oximesa"
+    ],
+    "technicalDifficulty": "Media",
+    "businessPotential": "Medio",
+    "barriers": "Estandarización de nomenclaturas, sesgos de cohorte, acuerdos con fabricantes para granularidad de datos.",
+    "validationSteps": "1) Definir KPIs clínicos y operativos comunes. 2) Construir panel piloto en 2 territorios. 3) Evaluar impacto en decisiones de compra y resultados de adherencia.",
+    "score": 7.9,
+    "tags": [
+      "BI",
+      "Device",
+      "CPAP",
+      "Compras",
+      "Outcome"
+    ],
+    "sourceLinks": [
+      "https://www.fphcare.com/us/homecare/sleep-apnea/",
+      "https://loewensteinmedical.com/en/",
+      "https://build.fhir.org/observation.html",
+      "https://build.fhir.org/device.html"
+    ],
+    "id": "3630dddb-8c75-4ede-ad15-addfe2980dac",
+    "createdAt": "2026-03-12T20:04:49.749Z"
+  },
+  {
+    "title": "Centro de mando multi-proveedor para hospital-at-home respiratorio",
+    "description": "Dashboard clínico-operativo único con estratificación de riesgo, estado de dispositivos y SLA de intervención para programas de hospitalización domiciliaria.",
+    "marketProblem": "Los proveedores tienen visibilidad parcial por portal y no pueden coordinar de forma eficiente neumología, enfermería, logística y soporte técnico.",
+    "proposedSolution": "Plataforma BI operativa con vistas por rol (clínico, operaciones, dirección), alertas accionables y trazabilidad de intervención.",
+    "technicalIntegration": "Data lakehouse con ingesta incremental de plataformas de fabricante y sistemas internos; métricas estandarizadas; SSO y control de acceso por perfil.",
+    "potentialClients": [
+      "Linde Healthcare",
+      "Vitalaire",
+      "Air Liquide Healthcare"
+    ],
+    "technicalDifficulty": "Media",
+    "businessPotential": "Medio",
+    "barriers": "Gobernanza de datos entre áreas, definición de KPIs clínico-operativos comunes.",
+    "validationSteps": "Despliegue en 2 unidades territoriales; medir reducción de tiempos de respuesta y visitas evitables en 90 días.",
+    "score": 7.9,
+    "tags": [
+      "BI",
+      "HospitalAtHome",
+      "Dashboard",
+      "Telemonitorización",
+      "Operaciones"
+    ],
+    "sourceLinks": [
+      "https://www.usa.philips.com/healthcare/resource-catalog/landing/care-orchestrator",
+      "https://www.breas.com/en-US/products/life-support/everyware",
+      "https://es.vitalaire.com/"
+    ],
+    "id": "1e01bcc6-9e10-41c7-99f6-2f54cb940da0",
+    "createdAt": "2026-03-12T20:01:41.659Z"
+  },
+  {
+    "title": "Automatización de facturación y compliance (NCD/aseguradoras) para TRD",
+    "description": "Flujo RPA + reglas de negocio que genera evidencias de uso terapéutico, detecta gaps documentales y automatiza preliquidación para pagadores.",
+    "marketProblem": "Procesos de compliance y reclamaciones continúan siendo manuales y propensos a errores, especialmente en transiciones hospital-domicilio.",
+    "proposedSolution": "Orquestador de documentos y datos de terapia con alertas tempranas de riesgo de denegación y checklist automático por pagador.",
+    "technicalIntegration": "Conectores a plataformas de telemonitorización + HIS/ERP + repositorio documental; OCR de prescripciones; reglas por país/pagador; exportación EDI/CSV.",
+    "potentialClients": [
+      "Air Liquide Healthcare",
+      "Esteve Teijin",
+      "Oximesa"
+    ],
+    "technicalDifficulty": "Media",
+    "businessPotential": "Alto",
+    "barriers": "Heterogeneidad regulatoria por mercado, calidad documental desigual, dependencia de sistemas legacy.",
+    "validationSteps": "Piloto en una delegación regional; KPI: -30% rechazos de facturación y -25% tiempo administrativo por expediente en 3 meses.",
+    "score": 8.4,
+    "tags": [
+      "RevenueCycle",
+      "RPA",
+      "TRD",
+      "Compliance",
+      "Automatización"
+    ],
+    "sourceLinks": [
+      "https://www.breas.com/en-US/products/life-support/everyware",
+      "https://www.usa.philips.com/healthcare/product/HC1126366/care-orchestrator",
+      "https://www.resmed.com/en-us/health-professionals/solutions/airview-for-ventilation/"
+    ],
+    "id": "703fbf33-94c6-43a3-a3bc-56fcaa75a254",
+    "createdAt": "2026-03-12T20:01:41.659Z"
+  },
+  {
+    "title": "Motor de adherencia y riesgo de abandono terapéutico para CPAP/NIV",
+    "description": "Analítica predictiva que estima riesgo de no adherencia a 7/30 días y prioriza intervenciones de enfermería/RT según impacto clínico y económico.",
+    "marketProblem": "Los equipos clínicos revisan paneles de forma reactiva; se pierde tiempo en pacientes estables y se llega tarde a pacientes con desenganche terapéutico.",
+    "proposedSolution": "Modelo de scoring multivariable + reglas clínicas configurables + colas de trabajo para contact center respiratorio.",
+    "technicalIntegration": "Pipeline de eventos diarios desde portales de fabricante; features de uso/noches/fugas/IAH/eventos; serving en API; integración con CRM y agenda de llamadas.",
+    "potentialClients": [
+      "Vitalaire",
+      "Oximesa",
+      "Air Liquide Healthcare",
+      "Linde Healthcare"
+    ],
+    "technicalDifficulty": "Media",
+    "businessPotential": "Alto",
+    "barriers": "Necesidad de datasets históricos etiquetados, sesgo por tipo de dispositivo, aceptación clínica del modelo.",
+    "validationSteps": "Entrenamiento retrospectivo 12 meses; AUC objetivo >0.75; RCT operacional con intervención priorizada vs estándar y medición de adherencia a 90 días.",
+    "score": 8.8,
+    "tags": [
+      "Adherencia",
+      "MachineLearning",
+      "CPAP",
+      "RemoteMonitoring",
+      "ClinicalOps"
+    ],
+    "sourceLinks": [
+      "https://pubmed.ncbi.nlm.nih.gov/41314437/",
+      "https://pubmed.ncbi.nlm.nih.gov/40806961/",
+      "https://pubmed.ncbi.nlm.nih.gov/40738979/",
+      "https://www.usa.philips.com/healthcare/resource-catalog/landing/care-orchestrator"
+    ],
+    "id": "6a268fd3-dcc1-4db2-9925-b0cce5148a97",
+    "createdAt": "2026-03-12T20:01:41.659Z"
+  },
+  {
+    "title": "Middleware FHIR/HL7 para unificar AirView, EveryWare y Care Orchestrator",
+    "description": "Capa de interoperabilidad que normaliza datos de ventilación/CPAP de múltiples fabricantes y los publica en FHIR (R4/R5) con conectores HL7 v2 para HIS/EMR.",
+    "marketProblem": "Los proveedores domiciliarios operan múltiples portales cerrados y exportaciones manuales; esto fragmenta seguimiento clínico, facturación y continuidad asistencial.",
+    "proposedSolution": "SaaS B2B con conectores por plataforma (ResMed, Breas, Philips) + mapeo semántico a perfiles FHIR de dispositivos respiratorios + APIs para BI y EHR.",
+    "technicalIntegration": "Ingesta por API/SFTP/reportes; transformación a recursos FHIR (Patient, Device, Observation, DeviceUsage); eventos a bus (Kafka/NATS); salida HL7 ORU/ADT y REST FHIR. Soporte para IG PHD de HL7.",
+    "potentialClients": [
+      "Air Liquide Healthcare",
+      "Vitalaire",
+      "Linde Healthcare",
+      "Oximesa",
+      "Esteve Teijin"
+    ],
+    "technicalDifficulty": "Alta",
+    "businessPotential": "Alto",
+    "barriers": "Acceso contractual a datos de fabricantes, variabilidad de modelos de dispositivos, cumplimiento GDPR y validación clínica.",
+    "validationSteps": "Piloto con 1 proveedor + 2 fabricantes; medir reducción de tiempo de conciliación de datos >40%; validar calidad de mapeo FHIR con neumología y sistemas.",
+    "score": 9.2,
+    "tags": [
+      "FHIR",
+      "HL7",
+      "Interoperabilidad",
+      "CPAP",
+      "VentilaciónDomiciliaria",
+      "SaaS"
+    ],
+    "sourceLinks": [
+      "https://www.resmed.com/en-us/health-professionals/solutions/airview-for-ventilation/",
+      "https://www.breas.com/en-US/products/life-support/everyware",
+      "https://www.usa.philips.com/healthcare/product/HC1126366/care-orchestrator",
+      "https://www.hl7.org/fhir/",
+      "https://build.fhir.org/ig/HL7/phd/"
+    ],
+    "id": "b35e447d-9dcd-49ec-9725-fe6124d3b98b",
+    "createdAt": "2026-03-12T20:01:41.659Z"
+  }
+]
