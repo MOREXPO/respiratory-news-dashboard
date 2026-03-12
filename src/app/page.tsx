@@ -58,7 +58,10 @@ export default function Home() {
         {loading ? (
           <p>Cargando…</p>
         ) : groupedByDate.length === 0 ? (
-          <p className="text-zinc-400">No hay noticias para ese filtro.</p>
+          <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6 text-center">
+            <p className="text-lg font-semibold">No hay noticias relevantes</p>
+            <p className="text-zinc-400 mt-1">No se han encontrado novedades en el rango de fechas y empresas seleccionadas.</p>
+          </section>
         ) : (
           <div className="space-y-4">
             {groupedByDate.map(([date, items]) => (
