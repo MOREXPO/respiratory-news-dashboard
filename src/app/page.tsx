@@ -73,7 +73,6 @@ export default function Home() {
     setRunningScan(true);
     setScanMsg('Scouting lanzado. Puede tardar unos minutos...');
     setToast('Scouting en curso: puede tardar unos minutos en aparecer. Refrescaremos automáticamente en 5 minutos.');
-    setTimeout(() => setToast(''), 7000);
 
     try {
       const res = await fetch('/api/opportunities/run', { method: 'POST' });
@@ -82,14 +81,20 @@ export default function Home() {
 
       // Optional immediate refresh + guaranteed delayed refresh in 5 minutes
       await loadOpps();
-      setTimeout(() => {
-        loadOpps();
+      setTimeout(async () => {
+        await loadOpps();
+        setToast('Scouting completado. Lista actualizada.');
+        setScanMsg('Scouting completado.');
+        setTimeout(() => setToast(''), 5000);
       }, 5 * 60 * 1000);
     } catch {
       // Do not surface noisy timeout errors to user
       setScanMsg('Scouting lanzado. Revisa en unos minutos.');
-      setTimeout(() => {
-        loadOpps();
+      setTimeout(async () => {
+        await loadOpps();
+        setToast('Scouting completado. Lista actualizada.');
+        setScanMsg('Scouting completado.');
+        setTimeout(() => setToast(''), 5000);
       }, 5 * 60 * 1000);
     } finally {
       setRunningScan(false);
