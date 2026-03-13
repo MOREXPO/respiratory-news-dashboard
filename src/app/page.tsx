@@ -71,22 +71,26 @@ export default function Home() {
 
   async function runOpportunityScan() {
     setRunningScan(true);
-    setScanMsg('Ejecutando detección...');
-    setToast('Scouting en curso: puede tardar unos minutos en aparecer. Se refrescará automáticamente.');
-    setTimeout(() => setToast(''), 6000);
+    setScanMsg('Scouting lanzado. Puede tardar unos minutos...');
+    setToast('Scouting en curso: puede tardar unos minutos en aparecer. Refrescaremos automáticamente en 5 minutos.');
+    setTimeout(() => setToast(''), 7000);
 
     try {
       const res = await fetch('/api/opportunities/run', { method: 'POST' });
-      const data = await res.json();
-      setScanMsg(data?.message || 'Detección lanzada.');
+      const data = await res.json().catch(() => ({}));
+      setScanMsg(data?.message || 'Scouting lanzado correctamente.');
 
-      // Refresh now and again after a delay (OpenClaw job may finish later)
+      // Optional immediate refresh + guaranteed delayed refresh in 5 minutes
       await loadOpps();
       setTimeout(() => {
         loadOpps();
-      }, 90000);
+      }, 5 * 60 * 1000);
     } catch {
-      setScanMsg('Error ejecutando la detección manual.');
+      // Do not surface noisy timeout errors to user
+      setScanMsg('Scouting lanzado. Revisa en unos minutos.');
+      setTimeout(() => {
+        loadOpps();
+      }, 5 * 60 * 1000);
     } finally {
       setRunningScan(false);
     }
