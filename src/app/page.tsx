@@ -148,7 +148,7 @@ export default function Home() {
     <main className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-10">
       <div className="mx-auto max-w-6xl space-y-5">
         <h1 className="text-3xl font-bold">Respiratory Intelligence Hub</h1>
-        <p className="text-zinc-400">Noticias + oportunidades de negocio en una sola web.</p>
+        <p className="text-zinc-400">Noticias + fichas de partnership en una sola web.</p>
         {toast && (
           <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-200">
             {toast}
@@ -286,18 +286,24 @@ export default function Home() {
                       <span className="rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1">{new Date(o.createdAt).toLocaleDateString('es-ES')}</span>
                     </div>
 
-                    <p className="text-zinc-300">{o.description}</p>
-                    <p><b>Problema:</b> {o.marketProblem}</p>
-                    <p><b>Solución:</b> {o.proposedSolution}</p>
-                    <p><b>Integración:</b> {o.technicalIntegration}</p>
+                    <p className="text-zinc-300"><b>Empresa objetivo:</b> {o.description}</p>
+                    <p><b>Por qué encaja:</b> {o.marketProblem}</p>
+                    <p><b>Qué podemos hacer juntos:</b> {o.proposedSolution}</p>
+                    <p><b>Integración técnica posible:</b> {o.technicalIntegration}</p>
+                    <p><b>Siguiente paso recomendado:</b> {o.validationSteps}</p>
 
                     <div className="flex flex-wrap gap-2">
                       {o.tags.slice(0, 8).map((t) => <span key={t} className="text-xs px-2 py-1 rounded bg-zinc-800 border border-zinc-700">{t}</span>)}
                     </div>
 
+                    <div className="grid md:grid-cols-2 gap-2 text-sm">
+                      <p><b>Nivel de acceso:</b> {o.barriers}</p>
+                      <p><b>Clientes potenciales:</b> {o.potentialClients?.join(', ') || 'N/A'}</p>
+                    </div>
+
                     {o.sourceLinks?.length > 0 && (
                       <div className="pt-1">
-                        <p className="text-xs text-zinc-400 mb-1">Fuentes:</p>
+                        <p className="text-xs text-zinc-400 mb-1">Enlaces de investigación:</p>
                         <ul className="list-disc pl-5 text-sm text-blue-300 space-y-1">
                           {o.sourceLinks.slice(0, 6).map((s) => (
                             <li key={s}>
