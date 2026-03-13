@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+export type NewsRelevance = 'ALTA' | 'MEDIA' | 'BAJA';
+
 export type NewsItem = {
   id: string;
   company: string;
@@ -9,6 +11,7 @@ export type NewsItem = {
   summary: string;
   url: string;
   source?: string;
+  relevance: NewsRelevance;
   createdAt: string;
 };
 
@@ -31,12 +34,23 @@ export function saveNews(items: NewsItem[]) {
   fs.writeFileSync(dataFile, JSON.stringify(items, null, 2), 'utf8');
 }
 
-export function addNews(items: Omit<NewsItem, 'id' | 'createdAt'>[]) {
+function classifyRelevance(title: string, summary: string): NewsRelevance {
+  const text = `${title} ${summary}`.toLowerCase();
+  const highSignals = ['fda', 'recall', 'approval', 'acquisition', 'merger', 'consent decree', 'warning', 'regulator', 'earnings'];
+  const midSignals = ['partnership', 'integrat', 'platform', 'launch', 'pilot', 'study', 'clinical'];
+
+  if (highSignals.some((k) => text.includes(k))) return 'ALTA';
+  if (midSignals.some((k) => text.includes(k))) return 'MEDIA';
+  return 'BAJA';
+}
+
+export function addNews(items: Array<Partial<NewsItem> & { company: string; date: string; title: string; summary: string; url: string }>) {
   const current = listNews();
   const now = new Date().toISOString();
 
-  const next: NewsItem[] = items.map((n) => ({
+  const next: NewsItem[] = items.map((n: any) => ({
     ...n,
+    relevance: n.relevance || classifyRelevance(n.title || '', n.summary || ''),
     id: crypto.randomUUID(),
     createdAt: now,
   }));

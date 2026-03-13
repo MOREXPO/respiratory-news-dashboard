@@ -31,6 +31,7 @@ export default function Home() {
   const [company, setCompany] = useState('ALL');
   const [from, setFrom] = useState(weekAgo);
   const [to, setTo] = useState(today);
+  const [newsRelevance, setNewsRelevance] = useState<'ALL' | 'ALTA' | 'MEDIA' | 'BAJA'>('ALL');
   const [news, setNews] = useState<NewsItem[]>([]);
 
   const [opps, setOpps] = useState<Opportunity[]>([]);
@@ -50,7 +51,7 @@ export default function Home() {
   const [toast, setToast] = useState('');
 
   async function loadNews() {
-    const query = new URLSearchParams({ company, from, to });
+    const query = new URLSearchParams({ company, from, to, relevance: newsRelevance });
     const res = await fetch(`/api/news?${query.toString()}`, { cache: 'no-store' });
     const data = await res.json();
     setNews(Array.isArray(data) ? data : []);
@@ -162,13 +163,19 @@ export default function Home() {
 
         {loading ? <p>Cargando…</p> : tab === 'news' ? (
           <>
-            <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 grid md:grid-cols-4 gap-3">
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 grid md:grid-cols-5 gap-3">
               <select className="bg-zinc-800 rounded px-3 py-2" value={company} onChange={(e) => setCompany(e.target.value)}>
                 <option value="ALL">Todas las empresas</option>
                 {COMPANIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
               <input className="bg-zinc-800 rounded px-3 py-2" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
               <input className="bg-zinc-800 rounded px-3 py-2" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+              <select className="bg-zinc-800 rounded px-3 py-2" value={newsRelevance} onChange={(e) => setNewsRelevance(e.target.value as any)}>
+                <option value="ALL">Relevancia: todas</option>
+                <option value="ALTA">ALTA</option>
+                <option value="MEDIA">MEDIA</option>
+                <option value="BAJA">BAJA</option>
+              </select>
               <button className="bg-blue-600 hover:bg-blue-500 rounded px-3 py-2" onClick={loadNews}>Actualizar</button>
             </section>
 
@@ -186,7 +193,12 @@ export default function Home() {
                       {items.map((n) => (
                         <article key={n.id} className="rounded-lg border border-zinc-800 p-3">
                           <p className="text-xs text-zinc-400">{n.company}{n.source ? ` · ${n.source}` : ''}</p>
-                          <h3 className="font-medium">{n.title}</h3>
+                          <div className="flex items-center justify-between gap-2">
+                            <h3 className="font-medium">{n.title}</h3>
+                            <span className={`text-xs rounded-full px-2 py-1 border ${n.relevance === 'ALTA' ? 'border-red-400/40 bg-red-500/10 text-red-300' : n.relevance === 'MEDIA' ? 'border-amber-400/40 bg-amber-500/10 text-amber-300' : 'border-zinc-600 bg-zinc-800 text-zinc-300'}`}>
+                              {n.relevance || 'BAJA'}
+                            </span>
+                          </div>
                           <p className="text-sm text-zinc-300">{n.summary}</p>
                           <a className="text-blue-400 text-sm underline" href={n.url} target="_blank">Ver fuente</a>
                         </article>

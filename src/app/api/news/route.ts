@@ -6,12 +6,14 @@ export async function GET(req: NextRequest) {
   const company = searchParams.get('company') || 'ALL';
   const from = searchParams.get('from');
   const to = searchParams.get('to');
+  const relevance = searchParams.get('relevance') || 'ALL';
 
   let items = listNews();
 
   if (company !== 'ALL') items = items.filter((n) => n.company === company);
   if (from) items = items.filter((n) => n.date >= from);
   if (to) items = items.filter((n) => n.date <= to);
+  if (relevance !== 'ALL') items = items.filter((n) => n.relevance === relevance);
 
   return NextResponse.json(items);
 }
