@@ -47,6 +47,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [runningScan, setRunningScan] = useState(false);
   const [scanMsg, setScanMsg] = useState('');
+  const [toast, setToast] = useState('');
 
   async function loadNews() {
     const query = new URLSearchParams({ company, from, to });
@@ -71,11 +72,19 @@ export default function Home() {
   async function runOpportunityScan() {
     setRunningScan(true);
     setScanMsg('Ejecutando detección...');
+    setToast('Scouting en curso: puede tardar unos minutos en aparecer. Se refrescará automáticamente.');
+    setTimeout(() => setToast(''), 6000);
+
     try {
       const res = await fetch('/api/opportunities/run', { method: 'POST' });
       const data = await res.json();
-      setScanMsg(data?.message || 'Detección completada.');
+      setScanMsg(data?.message || 'Detección lanzada.');
+
+      // Refresh now and again after a delay (OpenClaw job may finish later)
       await loadOpps();
+      setTimeout(() => {
+        loadOpps();
+      }, 90000);
     } catch {
       setScanMsg('Error ejecutando la detección manual.');
     } finally {
@@ -131,6 +140,11 @@ export default function Home() {
       <div className="mx-auto max-w-6xl space-y-5">
         <h1 className="text-3xl font-bold">Respiratory Intelligence Hub</h1>
         <p className="text-zinc-400">Noticias + oportunidades de negocio en una sola web.</p>
+        {toast && (
+          <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-200">
+            {toast}
+          </div>
+        )}
 
         <div className="inline-flex rounded-xl border border-zinc-700 overflow-hidden">
           <button className={`px-4 py-2 ${tab === 'news' ? 'bg-blue-600' : 'bg-zinc-900'}`} onClick={() => setTab('news')}>News</button>
