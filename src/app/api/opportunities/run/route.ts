@@ -7,11 +7,10 @@ const execFileAsync = promisify(execFile);
 const OPENCLAW_SCOUT_JOB_ID = '384c3ddf-184e-4b92-8d75-703844e44700';
 
 export async function POST() {
-  const before = listOpportunities().length;
-
   try {
-    await execFileAsync('openclaw', ['cron', 'run', OPENCLAW_SCOUT_JOB_ID, '--expect-final', '--timeout', '180000'], {
-      timeout: 190000,
+    // Trigger without waiting for full agent completion to avoid HTTP timeouts.
+    await execFileAsync('openclaw', ['cron', 'run', OPENCLAW_SCOUT_JOB_ID, '--timeout', '20000'], {
+      timeout: 25000,
       maxBuffer: 1024 * 1024,
     });
   } catch (err: any) {
@@ -19,12 +18,10 @@ export async function POST() {
     return NextResponse.json({ ok: false, inserted: 0, message: `Error al disparar job OpenClaw: ${message}` }, { status: 500 });
   }
 
-  const after = listOpportunities().length;
-  const inserted = Math.max(0, after - before);
-
+  const currentCount = listOpportunities().length;
   return NextResponse.json({
     ok: true,
-    inserted,
-    message: `Job OpenClaw ejecutado. Nuevas oportunidades insertadas: ${inserted}.`,
+    inserted: 0,
+    message: `Job OpenClaw disparado correctamente. Revisa la lista en unos segundos. Total actual: ${currentCount}.`,
   });
 }
