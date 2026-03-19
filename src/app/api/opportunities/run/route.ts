@@ -19,6 +19,27 @@ function score(name: string, snippet: string) {
   return Math.min(9.4, Number(s.toFixed(1)));
 }
 
+function normTitle(s: string) {
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\b(inc|ltd|llc|corp|corporation|sa|ag|gmbh|medical|healthcare|technologies|technology|systems)\b/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function rootDomain(url?: string) {
+  if (!url) return '';
+  try {
+    const h = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+    const p = h.split('.');
+    return p.slice(-2).join('.');
+  } catch {
+    return '';
+  }
+}
+
 async function ddg(query: string): Promise<Hit[]> {
   const res = await fetch(`https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`, {
     cache: 'no-store',
@@ -71,7 +92,9 @@ async function ddg(query: string): Promise<Hit[]> {
 }
 
 export async function POST() {
-  const existing = new Set(listOpportunities().map((o) => o.title.toLowerCase()));
+  const existingItems = listOpportunities();
+  const existingTitleKeys = new Set(existingItems.map((o) => normTitle(o.title)));
+  const existingDomainKeys = new Set(existingItems.map((o) => rootDomain(o.sourceLinks?.[1] || o.sourceLinks?.[0])).filter(Boolean));
 
   const queries = [
     'respiratory homecare company remote monitoring platform',
@@ -89,12 +112,30 @@ export async function POST() {
     uniq.push(h);
   }
 
-  const fresh = uniq.filter((h) => !existing.has(h.name.toLowerCase())).slice(0, 5);
-  if (!fresh.length) {
-    return NextResponse.json({ ok: true, inserted: 0, message: 'Scouting live (sin Brave) completado: no hay nuevas empresas.' });
+  const selected: Hit[] = [];
+  const selectedTitleKeys = new Set<string>();
+  const selectedDomainKeys = new Set<string>();
+
+  for (const h of uniq) {
+    const tKey = normTitle(h.name);
+    const dKey = rootDomain(h.website) || rootDomain(h.source);
+
+    const repeatedByTitle = tKey && (existingTitleKeys.has(tKey) || selectedTitleKeys.has(tKey));
+    const repeatedByDomain = dKey && (existingDomainKeys.has(dKey) || selectedDomainKeys.has(dKey));
+    if (repeatedByTitle || repeatedByDomain) continue;
+
+    selected.push(h);
+    if (tKey) selectedTitleKeys.add(tKey);
+    if (dKey) selectedDomainKeys.add(dKey);
+
+    if (selected.length >= 5) break;
   }
 
-  const items = fresh.map((h) => ({
+  if (!selected.length) {
+    return NextResponse.json({ ok: true, inserted: 0, message: 'Scouting live (sin Brave) completado: no hay nuevas empresas no repetidas.' });
+  }
+
+  const items = selected.map((h) => ({
     title: h.name,
     description: `Empresa detectada en scouting live sin Brave. Web: ${h.website}. ${h.snippet ? `Contexto: ${h.snippet}` : ''}`,
     marketProblem: 'Fragmentación de datos y procesos entre plataformas/fabricantes y proveedores de terapia domiciliaria.',
