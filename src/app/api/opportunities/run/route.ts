@@ -40,8 +40,11 @@ function rootDomain(url?: string) {
   }
 }
 
-async function ddg(query: string): Promise<Hit[]> {
-  const res = await fetch(`https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`, {
+async function ddg(query: string, excludeNames: string[] = []): Promise<Hit[]> {
+  const negative = excludeNames.slice(0, 12).map((n) => ` -"${n}"`).join('');
+  const finalQuery = `${query}${negative}`;
+
+  const res = await fetch(`https://duckduckgo.com/html/?q=${encodeURIComponent(finalQuery)}`, {
     cache: 'no-store',
     headers: { 'User-Agent': 'Mozilla/5.0' },
   });
@@ -79,7 +82,7 @@ async function ddg(query: string): Promise<Hit[]> {
 
     const website = `${new URL(finalUrl).protocol}//${new URL(finalUrl).hostname}`;
     out.push({ name, website: website, source: finalUrl, snippet });
-    if (out.length >= 40) break;
+    if (out.length >= 10) break;
   }
 
   const seen = new Set<string>();
@@ -97,34 +100,16 @@ export async function POST() {
   const existingDomainKeys = new Set(existingItems.map((o) => rootDomain(o.sourceLinks?.[1] || o.sourceLinks?.[0])).filter(Boolean));
 
   const queries = [
-    'respiratory homecare company remote monitoring platform',
-    'CPAP NIV manufacturer API integration',
-    'sleep apnea digital health company medical device',
-    'respiratory therapy startup interoperability FHIR HL7',
-    'digital respiratory care company provider integration',
-    'portable oxygen concentrator company connected platform API',
-
-    // broader and regional discovery
-    'respiratory medtech startup Europe homecare',
-    'connected inhaler company API platform',
-    'digital therapeutics respiratory company B2B',
-    'telehealth respiratory monitoring company hospital at home',
-    'home oxygen therapy company remote patient monitoring',
-    'NIV ventilator platform integration company',
-
-    // ES / LATAM search surface
-    'fabricante terapia respiratoria domiciliaria plataforma digital',
-    'empresa telemonitorizacion respiratoria integracion hospital domicilio',
-    'empresa apnea del sueno dispositivo conectado',
-    'proveedor tecnologia respiratoria interoperabilidad fhir',
-
-    // APAC/Global diversification
-    'respiratory device company Singapore remote monitoring',
-    'respiratory care platform Australia startup',
-    'sleep tech company Japan medical device',
+    'global respiratory homecare companies remote monitoring integration',
+    'global CPAP NIV manufacturers API interoperability',
+    'global sleep apnea digital health medical device companies',
+    'global respiratory therapy startups FHIR HL7 integration',
+    'global connected inhaler and oxygen therapy companies platform API',
+    'global hospital at home respiratory technology companies',
   ];
 
-  const hits = (await Promise.all(queries.map((q) => ddg(q).catch(() => [])))).flat();
+  const excludeForSearch = Array.from(existingTitleKeys).slice(0, 20);
+  const hits = (await Promise.all(queries.map((q) => ddg(q, excludeForSearch).catch(() => [])))).flat();
   const uniq: Hit[] = [];
   const seen = new Set<string>();
   for (const h of hits) {
