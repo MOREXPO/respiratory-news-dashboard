@@ -79,7 +79,7 @@ async function ddg(query: string): Promise<Hit[]> {
 
     const website = `${new URL(finalUrl).protocol}//${new URL(finalUrl).hostname}`;
     out.push({ name, website: website, source: finalUrl, snippet });
-    if (out.length >= 25) break;
+    if (out.length >= 40) break;
   }
 
   const seen = new Set<string>();
@@ -102,9 +102,26 @@ export async function POST() {
     'sleep apnea digital health company medical device',
     'respiratory therapy startup interoperability FHIR HL7',
     'digital respiratory care company provider integration',
+    'portable oxygen concentrator company connected platform API',
+
+    // broader and regional discovery
+    'respiratory medtech startup Europe homecare',
+    'connected inhaler company API platform',
+    'digital therapeutics respiratory company B2B',
+    'telehealth respiratory monitoring company hospital at home',
+    'home oxygen therapy company remote patient monitoring',
+    'NIV ventilator platform integration company',
+
+    // ES / LATAM search surface
     'fabricante terapia respiratoria domiciliaria plataforma digital',
     'empresa telemonitorizacion respiratoria integracion hospital domicilio',
-    'portable oxygen concentrator company connected platform API',
+    'empresa apnea del sueno dispositivo conectado',
+    'proveedor tecnologia respiratoria interoperabilidad fhir',
+
+    // APAC/Global diversification
+    'respiratory device company Singapore remote monitoring',
+    'respiratory care platform Australia startup',
+    'sleep tech company Japan medical device',
   ];
 
   const hits = (await Promise.all(queries.map((q) => ddg(q).catch(() => [])))).flat();
