@@ -3,6 +3,19 @@ import { insertOpportunities, listOpportunities } from '@/lib/opportunity-store'
 
 type Hit = { name: string; website: string; source: string; snippet: string };
 
+type ReserveCandidate = { name: string; website: string; source: string; snippet: string };
+
+const RESERVE_CANDIDATES: ReserveCandidate[] = [
+  { name: 'MIR Spiro', website: 'https://www.spirometry.com', source: 'https://www.spirometry.com', snippet: 'Spirometry and respiratory diagnostics solutions.' },
+  { name: 'PulmOne', website: 'https://www.pulmone.com', source: 'https://www.pulmone.com', snippet: 'Lung function testing and respiratory diagnostics.' },
+  { name: 'MonitAir', website: 'https://www.monitair.com', source: 'https://www.monitair.com', snippet: 'Respiratory remote monitoring and telehealth.' },
+  { name: 'LungPass', website: 'https://www.lungpass.com', source: 'https://www.lungpass.com', snippet: 'Respiratory diagnostics and digital spirometry.' },
+  { name: 'Aevice Health', website: 'https://www.aevice.com', source: 'https://www.aevice.com', snippet: 'Wearable respiratory monitoring platform.' },
+  { name: 'Adherium', website: 'https://www.adherium.com', source: 'https://www.adherium.com', snippet: 'Connected inhaler adherence technology.' },
+  { name: 'Medify Air', website: 'https://medifyair.com', source: 'https://medifyair.com', snippet: 'Respiratory air quality and patient environment tech.' },
+  { name: 'TidalSense', website: 'https://www.tidalsense.com', source: 'https://www.tidalsense.com', snippet: 'Respiratory diagnostics and AI-driven monitoring.' },
+];
+
 function normalizeCompany(raw: string) {
   return raw
     .replace(/\s*[-|–—].*$/, '')
@@ -138,8 +151,24 @@ export async function POST() {
     if (selected.length >= 5) break;
   }
 
+  // Fallback reserve when live search finds no unique candidates
   if (!selected.length) {
-    return NextResponse.json({ ok: true, inserted: 0, message: 'Scouting live (sin Brave) completado: no hay nuevas empresas no repetidas.' });
+    for (const r of RESERVE_CANDIDATES) {
+      const tKey = normTitle(r.name);
+      const dKey = rootDomain(r.website) || rootDomain(r.source);
+      const repeatedByTitle = tKey && (existingTitleKeys.has(tKey) || selectedTitleKeys.has(tKey));
+      const repeatedByDomain = dKey && (existingDomainKeys.has(dKey) || selectedDomainKeys.has(dKey));
+      if (repeatedByTitle || repeatedByDomain) continue;
+
+      selected.push({ name: r.name, website: r.website, source: r.source, snippet: r.snippet });
+      if (tKey) selectedTitleKeys.add(tKey);
+      if (dKey) selectedDomainKeys.add(dKey);
+      if (selected.length >= 3) break;
+    }
+  }
+
+  if (!selected.length) {
+    return NextResponse.json({ ok: true, inserted: 0, message: 'Scouting live completado: sin nuevas empresas (incluyendo reserva).' });
   }
 
   const items = selected.map((h) => ({
