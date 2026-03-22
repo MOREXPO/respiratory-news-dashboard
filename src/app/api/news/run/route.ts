@@ -40,6 +40,8 @@ function ymdFromPubDate(pubDate?: string) {
 
 function parseRss(xml: string, company: string): ParsedItem[] {
   const out: ParsedItem[] = [];
+  const companyLower = company.toLowerCase();
+  const respTerms = /(respir|cpap|sleep|apnea|ventil|oxygen|ox[ií]geno|homecare|spirom|inhal|pulmon|airway)/i;
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
   let m: RegExpExecArray | null;
 
@@ -52,6 +54,12 @@ function parseRss(xml: string, company: string): ParsedItem[] {
     const pubDate = text((block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] || '').trim());
 
     if (!title || !link) continue;
+
+    const hay = `${title} ${desc}`.toLowerCase();
+    const hasCompanyHint = hay.includes(companyLower.split(' ')[0]) || hay.includes(companyLower);
+    const hasRespHint = respTerms.test(hay);
+    if (!hasCompanyHint && !hasRespHint) continue;
+
     out.push({
       company,
       date: ymdFromPubDate(pubDate),
